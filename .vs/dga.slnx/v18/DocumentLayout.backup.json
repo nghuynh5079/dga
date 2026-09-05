@@ -1,0 +1,72 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\dga\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{44B0E126-DF76-86FF-A0B8-34DC23353BE6}|DevGitAtom.Core\\DevGitAtom.Core.csproj|d:\\dga\\devgitatom.core\\atomregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{44B0E126-DF76-86FF-A0B8-34DC23353BE6}|DevGitAtom.Core\\DevGitAtom.Core.csproj|solutionrelative:devgitatom.core\\atomregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{44B0E126-DF76-86FF-A0B8-34DC23353BE6}|DevGitAtom.Core\\DevGitAtom.Core.csproj|d:\\dga\\devgitatom.core\\atomresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{44B0E126-DF76-86FF-A0B8-34DC23353BE6}|DevGitAtom.Core\\DevGitAtom.Core.csproj|solutionrelative:devgitatom.core\\atomresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 1881,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AtomRegistry.cs",
+              "DocumentMoniker": "D:\\dga\\DevGitAtom.Core\\AtomRegistry.cs",
+              "RelativeDocumentMoniker": "DevGitAtom.Core\\AtomRegistry.cs",
+              "ToolTip": "D:\\dga\\DevGitAtom.Core\\AtomRegistry.cs",
+              "RelativeToolTip": "DevGitAtom.Core\\AtomRegistry.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-05T15:26:07.743Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AtomResult.cs",
+              "DocumentMoniker": "D:\\dga\\DevGitAtom.Core\\AtomResult.cs",
+              "RelativeDocumentMoniker": "DevGitAtom.Core\\AtomResult.cs",
+              "ToolTip": "D:\\dga\\DevGitAtom.Core\\AtomResult.cs",
+              "RelativeToolTip": "DevGitAtom.Core\\AtomResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-05T15:26:05.464Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1881,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

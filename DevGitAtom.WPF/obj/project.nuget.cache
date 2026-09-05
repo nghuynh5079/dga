@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ubL6RKoee7M=",
+  "success": true,
+  "projectFilePath": "D:\\dev-git-csharp\\DevGitAtom.WPF\\DevGitAtom.WPF.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\nghuy\\.nuget\\packages\\microsoft.web.webview2\\1.0.4191.47\\microsoft.web.webview2.1.0.4191.47.nupkg.sha512"
+  ],
+  "logs": []
+}

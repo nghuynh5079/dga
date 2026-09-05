@@ -1,0 +1,12 @@
+global using Application       = System.Windows.Application;
+global using Color              = System.Windows.Media.Color;
+global using Brushes            = System.Windows.Media.Brushes;
+global using Button             = System.Windows.Controls.Button;
+global using Orientation        = System.Windows.Controls.Orientation;
+global using DragEventArgs      = System.Windows.DragEventArgs;
+global using DragDropEffects    = System.Windows.DragDropEffects;
+global using Cursors            = System.Windows.Input.Cursors;
+global using MessageBox         = System.Windows.MessageBox;
+global using MessageBoxButton   = System.Windows.MessageBoxButton;
+global using MessageBoxImage    = System.Windows.MessageBoxImage;
+global using WinForms           = System.Windows.Forms;
