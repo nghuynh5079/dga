@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\DevGitAtom.Core\DevGitAtom.Core.csproj" />
+    <ProjectReference Include="..\DevGitAtom.Contracts\DevGitAtom.Contracts.csproj" />
+    <ProjectReference Include="..\DevGitAtom.Engine\DevGitAtom.Engine.csproj" />
+    <ProjectReference Include="..\DevGitAtom.GitAtoms\DevGitAtom.GitAtoms.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,4 +25,4 @@
     </Content>
   </ItemGroup>
 
-</Project>
+  <ItemGroup><Resource Include="Assets\logo.jpg" /></ItemGroup></Project>

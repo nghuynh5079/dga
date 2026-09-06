@@ -1,0 +1,46 @@
+<Window x:Class="DevGitAtom.WPF.UI.Windows.HistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Run History" Height="500" Width="700"
+        Background="{DynamicResource BgPrimary}"
+        Foreground="{DynamicResource TextPrimary}"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Text="CHAIN RUN HISTORY" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentBlue}" Margin="0,0,0,12"/>
+        
+        <ListView Grid.Row="1" x:Name="LvHistory" Background="{DynamicResource BgSecondary}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Thời gian" Width="140" DisplayMemberBinding="{Binding Timestamp}"/>
+                    <GridViewColumn Header="Trạng thái" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding IsSuccess}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#ff7b72"/>
+                                            <Setter Property="Text" Value="Failed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSuccess}" Value="True">
+                                                    <Setter Property="Foreground" Value="#3fb950"/>
+                                                    <Setter Property="Text" Value="Success"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Workspace" Width="150" DisplayMemberBinding="{Binding Workspace}"/>
+                    <GridViewColumn Header="Chain Summary" Width="280" DisplayMemberBinding="{Binding ChainSummary}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>

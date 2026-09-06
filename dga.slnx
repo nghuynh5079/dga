@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="DevGitAtom.Core/DevGitAtom.Core.csproj" />
+  <Project Path="DevGitAtom.Contracts/DevGitAtom.Contracts.csproj" />
+  <Project Path="DevGitAtom.Engine/DevGitAtom.Engine.csproj" />
+  <Project Path="DevGitAtom.GitAtoms/DevGitAtom.GitAtoms.csproj" />
   <Project Path="DevGitAtom.WPF/DevGitAtom.WPF.csproj" />
 </Solution>

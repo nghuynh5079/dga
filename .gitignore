@@ -38,3 +38,20 @@ desktop.ini
 
 # Logs
 *.log
+
+# ── Sensitive / local dev data ──────────────────────────────────────────────
+# Thư mục này chứa dữ liệu phát triển nội bộ, KHÔNG được push lên Git
+docs/dev-data/*
+!docs/dev-data/.gitkeep
+
+# Các file config chứa secret (connection string, api key, password...)
+*.secret
+*.secrets
+appsettings.local.json
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
+
+# Logs
+GitErrorLogs/

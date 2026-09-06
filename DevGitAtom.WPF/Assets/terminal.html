@@ -47,6 +47,19 @@ const fitAddon = new FitAddon.FitAddon();
 const webLinksAddon = new WebLinksAddon.WebLinksAddon();
 term.loadAddon(fitAddon);
 term.loadAddon(webLinksAddon);
+
+// Handle Ctrl+C for copy if text is selected
+term.attachCustomKeyEventHandler(e => {
+  if (e.ctrlKey && e.code === 'KeyC' && e.type === 'keydown') {
+    const selection = term.getSelection();
+    if (selection) {
+      navigator.clipboard.writeText(selection);
+      return false; // Prevent default action (sending to shell)
+    }
+  }
+  return true;
+});
+
 term.open(document.getElementById('terminal'));
 fitAddon.fit();
 
