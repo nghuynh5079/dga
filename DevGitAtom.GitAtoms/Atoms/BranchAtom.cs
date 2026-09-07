@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DevGitAtom.Contracts;
 
-namespace DevGitAtom.GitAtoms;
+namespace DevGitAtom.GitAtoms.Atoms;
 
 public class BranchAtom : IAtom
 {

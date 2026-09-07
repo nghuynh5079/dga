@@ -10,6 +10,8 @@ using System.Windows.Input;
 using DevGitAtom.Contracts;
 using DevGitAtom.Engine;
 using DevGitAtom.GitAtoms;
+using DevGitAtom.GitAtoms.Atoms;
+using DevGitAtom.Engine.Logging;
 
 using Microsoft.Web.WebView2.Core;
 
@@ -58,33 +60,42 @@ public partial class MainWindow : Window
 <head>
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css"" />
     <script src=""https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js""></script>
+    <script src=""https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js""></script>
     <style>
-        body { margin: 0; background-color: #0d1117; overflow: hidden; }
-        #terminal { height: 100vh; width: 100vw; padding: 12px; }
-        .xterm-viewport { overflow-y: auto !important; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; background: #0d1117; overflow: hidden; }
+        #terminal { width: 100%; height: 100%; padding: 6px; }
+        .xterm { height: 100%; }
     </style>
 </head>
 <body>
     <div id=""terminal""></div>
     <script>
         const term = new Terminal({
-            theme: { background: '#0d1117', foreground: '#e6edf3' },
-            fontFamily: 'Consolas, monospace',
+            theme: { background: '#0d1117', foreground: '#e6edf3', cursor: '#58a6ff' },
+            fontFamily: 'Consolas, Courier New, monospace',
             fontSize: 13,
-            cursorBlink: true
+            cursorBlink: true,
+            scrollback: 5000
         });
+
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
         term.open(document.getElementById('terminal'));
 
-        window.writeToTerminal = function(text) {
-            term.write(text);
-        };
-        window.clearTerminal = function() {
-            term.clear();
-        };
+        function doFit() { try { fitAddon.fit(); } catch(e) {} }
+        setTimeout(doFit, 50);
+        window.addEventListener('resize', doFit);
 
-        term.onData(e => {
-            window.chrome.webview.postMessage(e);
-        });
+        document.addEventListener('mousedown',   () => term.focus());
+        document.addEventListener('pointerdown', () => term.focus());
+
+        window.writeToTerminal = function(text) { term.write(text); };
+        window.clearTerminal   = function()     { term.clear(); term.focus(); };
+        window.fitTerminal     = function()     { doFit(); term.focus(); };
+
+        term.onData(e => { window.chrome.webview.postMessage(e); });
+        term.focus();
     </script>
 </body>
 </html>";
@@ -93,6 +104,7 @@ public partial class MainWindow : Window
         
         await Task.Delay(500);
         StartPty();
+        JsonLogger.LogInfo("UI", "MainWindow Webview and Pty initialized.");
     }
 
     private void StartPty()
@@ -125,8 +137,8 @@ public partial class MainWindow : Window
     private async Task WriteToTerminalAsync(string text)
     {
         if (!_terminalReady) return;
-        var escaped = text.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r\n", "\\r\\n").Replace("\n", "\\n").Replace("\r", "\\r");
-        await TerminalWebView.CoreWebView2.ExecuteScriptAsync($"window.writeToTerminal('{escaped}')");
+        var json = System.Text.Json.JsonSerializer.Serialize(text);
+        await TerminalWebView.CoreWebView2.ExecuteScriptAsync($"window.writeToTerminal({json})");
     }
 
     private async void BtnClearTerminal_Click(object sender, RoutedEventArgs e)
@@ -159,6 +171,11 @@ public partial class MainWindow : Window
         _registry.Register(new LogAtom());
         _registry.Register(new StashAtom());
         _registry.Register(new StatusAtom());
+        
+        _registry.Register(new BranchProtectionAtom());
+        _registry.Register(new DryRunAtom());
+        _registry.Register(new SubmoduleUpdateAtom());
+        _registry.Register(new WorktreeAtom());
     }
 
     private void BuildAtomListUI()
@@ -365,6 +382,7 @@ public partial class MainWindow : Window
 
     private async void BtnRun_Click(object sender, RoutedEventArgs e)
     {
+        JsonLogger.LogInfo("Action", "User clicked Run Chain");
         if (_isRunning)
         {
             _cts?.Cancel();
@@ -453,8 +471,7 @@ public partial class MainWindow : Window
     // WINDOW CONTROLS
     // ═══════════════════════════════════════════════
 
-    private void BtnMinimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-    private void BtnMaximize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
     private void BtnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
     private void MenuGitGraph_Click(object sender, RoutedEventArgs e)
@@ -495,7 +512,7 @@ public partial class MainWindow : Window
         ApplyTheme("LightTheme");
     }
 
-    private void ApplyTheme(string themeName)
+    private static void ApplyTheme(string themeName)
     {
         var dict = new ResourceDictionary { Source = new Uri($"UI/Styles/Themes/{themeName}.xaml", UriKind.Relative) };
         Application.Current.Resources.MergedDictionaries.Clear();
@@ -523,6 +540,7 @@ public partial class MainWindow : Window
 
     private void SetWorkingDir(string path)
     {
+        JsonLogger.LogInfo("Workspace", $"Changed working directory to: {path}");
         _workingDir = path;
         TxtWorkingDir.Text = $"📁 {_workingDir}";
         _workspaceManager.AddWorkspace(_workingDir);
@@ -591,6 +609,7 @@ public partial class MainWindow : Window
         var dialog = new InputDialog("My Preset") { Owner = this };
         if (dialog.ShowDialog() == true)
         {
+            JsonLogger.LogInfo("Preset", $"User saved preset: {dialog.InputText}");
             _presetManager.SavePreset(dialog.InputText, _chain);
             ShowNotification($"Đã lưu preset: {dialog.InputText}");
         }

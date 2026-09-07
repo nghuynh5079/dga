@@ -2,20 +2,27 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:components="clr-namespace:DevGitAtom.WPF.UI.Components"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="Git Graph" Height="600" Width="800"
         Background="#0d1117"
+        Icon="pack://application:,,,/Assets/logo.ico"
         WindowStartupLocation="CenterOwner">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="48" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="48"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <Border Grid.Row="0" Background="#161b22" BorderBrush="#30363d" BorderThickness="0,0,0,1" Padding="12,8">
-            <TextBlock Text="GIT COMMIT GRAPH" Foreground="#58a6ff" FontWeight="Bold"/>
-        </Border>
+        <components:AtomTitleBar Grid.Row="0" Title="Git Graph" />
         
         <!-- Reusing the exact same TerminalWebView strategy for drawing the graph -->
         <wv2:WebView2 Grid.Row="1" x:Name="GraphWebView" DefaultBackgroundColor="Transparent"/>
     </Grid>
 </Window>
+
+
+

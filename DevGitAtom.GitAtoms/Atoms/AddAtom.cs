@@ -1,5 +1,5 @@
 using DevGitAtom.Contracts;
-namespace DevGitAtom.GitAtoms;
+namespace DevGitAtom.GitAtoms.Atoms;
 
 public class AddAtom : IAtom
 {

@@ -4,6 +4,7 @@ using System.Windows.Media;
 using DevGitAtom.Contracts;
 using DevGitAtom.Engine;
 using DevGitAtom.GitAtoms;
+using DevGitAtom.GitAtoms.Atoms;
 
 namespace DevGitAtom.WPF.UI.Dialogs;
 
@@ -58,5 +59,6 @@ public partial class ConfigDialog : Window
         DialogResult = false;
     }
 }
+
 
 

@@ -73,7 +73,17 @@ public partial class GitGraphWindow : Window
 </html>";
 
         GraphWebView.NavigateToString(html);
-        await Task.Delay(300);
+
+        // Wait for navigation to complete before injecting data
+        var tcs = new TaskCompletionSource<bool>();
+        void OnNavigated(object? s, CoreWebView2NavigationCompletedEventArgs args)
+        {
+            GraphWebView.CoreWebView2.NavigationCompleted -= OnNavigated;
+            tcs.SetResult(true);
+        }
+        GraphWebView.CoreWebView2.NavigationCompleted += OnNavigated;
+        await tcs.Task;
+
         await LoadGitGraphAsync(isFirstLoad: true);
     }
 
@@ -95,13 +105,14 @@ public partial class GitGraphWindow : Window
         var psi = new ProcessStartInfo
         {
             FileName = "git",
-            Arguments = $"log --graph --all --oneline --decorate --color=always --skip={_skip} -n {_limit}",
+            Arguments = $"--no-pager log --graph --all --oneline --decorate --color=always --skip={_skip} -n {_limit}",
             WorkingDirectory = _workingDir,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            StandardOutputEncoding = System.Text.Encoding.UTF8
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8
         };
 
         try
@@ -109,19 +120,23 @@ public partial class GitGraphWindow : Window
             using var proc = Process.Start(psi);
             if (proc == null) return;
 
-            while (!proc.StandardOutput.EndOfStream)
+            string output = await proc.StandardOutput.ReadToEndAsync();
+            string error = await proc.StandardError.ReadToEndAsync();
+
+            await proc.WaitForExitAsync();
+
+            if (!string.IsNullOrEmpty(error))
             {
-                var line = await proc.StandardOutput.ReadLineAsync();
-                if (line != null)
-                {
-                    var escaped = line.Replace("\\", "\\\\")
-                                      .Replace("'", "\\'")
-                                      .Replace("\"", "\\\"")
-                                      .Replace("\r", "")
-                                      .Replace("\n", "");
-                    
-                    await GraphWebView.CoreWebView2.ExecuteScriptAsync($"window.writeGraph('{escaped}\\r\\n');");
-                }
+                var errJson = System.Text.Json.JsonSerializer.Serialize($"\x1b[31m{error}\x1b[0m\r\n");
+                await GraphWebView.CoreWebView2.ExecuteScriptAsync($"window.writeGraph({errJson});");
+            }
+
+            if (!string.IsNullOrEmpty(output))
+            {
+                // Ensure properly formatted newlines for xterm
+                output = output.Replace("\r\n", "\n").Replace("\n", "\r\n");
+                var outJson = System.Text.Json.JsonSerializer.Serialize(output);
+                await GraphWebView.CoreWebView2.ExecuteScriptAsync($"window.writeGraph({outJson});");
             }
 
             if (isFirstLoad)
@@ -132,7 +147,8 @@ public partial class GitGraphWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            var exJson = System.Text.Json.JsonSerializer.Serialize($"\x1b[31m[Lỗi hệ thống: {ex.Message}]\x1b[0m\r\n");
+            await GraphWebView.CoreWebView2.ExecuteScriptAsync($"window.writeGraph({exJson});");
         }
         finally
         {

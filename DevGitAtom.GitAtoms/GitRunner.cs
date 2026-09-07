@@ -79,7 +79,13 @@ public static class GitRunner
                 }
             }
 
-            return (process.ExitCode, sb.ToString());
+            var finalOutput = sb.ToString();
+            if (process.ExitCode != 0)
+            {
+                finalOutput = GitErrorParser.TranslateError(finalOutput);
+            }
+
+            return (process.ExitCode, finalOutput);
         }
     }
 

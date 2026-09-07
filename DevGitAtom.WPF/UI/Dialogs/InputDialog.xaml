@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Lưu Preset" Height="180" Width="350"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Icon="pack://application:,,,/Assets/logo.ico"
         Background="#0d1117" Foreground="#e6edf3" FontFamily="Segoe UI">
     <Grid Margin="16">
         <Grid.RowDefinitions>

@@ -27,7 +27,7 @@ public class PseudoConsole : IDisposable
     private static extern bool InitializeProcThreadAttributeList(IntPtr lpAttributeList, int dwAttributeCount, int dwFlags, ref IntPtr lpSize);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool UpdateProcThreadAttribute(IntPtr lpAttributeList, uint dwFlags, IntPtr attribute, ref IntPtr value, IntPtr cbSize, IntPtr previousValue, IntPtr returnSize);
+    private static extern bool UpdateProcThreadAttribute(IntPtr lpAttributeList, uint dwFlags, IntPtr attribute, IntPtr value, IntPtr cbSize, IntPtr previousValue, IntPtr returnSize);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern void DeleteProcThreadAttributeList(IntPtr lpAttributeList);
@@ -100,10 +100,10 @@ public class PseudoConsole : IDisposable
     // --- Class Members ---
     private IntPtr _hPC;
     private PROCESS_INFORMATION _pi;
-    private SafeFileHandle _inputWriteSide;
-    private SafeFileHandle _outputReadSide;
-    private FileStream _inputStream;
-    private FileStream _outputStream;
+    private SafeFileHandle? _inputWriteSide;
+    private SafeFileHandle? _outputReadSide;
+    private FileStream? _inputStream;
+    private FileStream? _outputStream;
     public event EventHandler<string>? OutputReceived;
     private CancellationTokenSource _cts = new();
 
@@ -131,7 +131,7 @@ public class PseudoConsole : IDisposable
         IntPtr hPC_ptr = Marshal.AllocHGlobal(IntPtr.Size);
         Marshal.WriteIntPtr(hPC_ptr, _hPC);
 
-        UpdateProcThreadAttribute(attrList, 0, (IntPtr)PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, ref _hPC, (IntPtr)IntPtr.Size, IntPtr.Zero, IntPtr.Zero);
+        UpdateProcThreadAttribute(attrList, 0, (IntPtr)PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, hPC_ptr, (IntPtr)IntPtr.Size, IntPtr.Zero, IntPtr.Zero);
 
         STARTUPINFOEX siex = new STARTUPINFOEX();
         siex.StartupInfo.cb = Marshal.SizeOf<STARTUPINFOEX>();
@@ -173,6 +173,7 @@ public class PseudoConsole : IDisposable
 
     private void ReadOutputLoop()
     {
+        if (_outputStream is null) return;
         byte[] buffer = new byte[4096];
         try
         {
@@ -197,3 +198,5 @@ public class PseudoConsole : IDisposable
         if (_hPC != IntPtr.Zero) ClosePseudoConsole(_hPC);
     }
 }
+
+

@@ -7,7 +7,7 @@ public enum AtomCategory
     Navigation,
     Worktree,
     History,
-    Info
+    Cleanup,
+    Info,
+    Diagnostic
 }
-
-

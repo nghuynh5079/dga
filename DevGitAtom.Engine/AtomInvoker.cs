@@ -30,10 +30,18 @@ public class AtomInvoker(AtomRegistry registry)
                 // Nếu thao tác mạng thất bại, thử lại
                 if (outcome == AtomOutcome.Failed && currentAttempt < maxRetries)
                 {
-                    currentAttempt++;
-                    output.Report($"   [RETRY] Có lỗi xảy ra, tự động thử lại lần {currentAttempt}/{maxRetries} sau 3 giây...");
-                    await Task.Delay(3000);
-                    continue;
+                    if (!FeatureFlags.Instance.IsEnabled("EnableRetry"))
+                    {
+                        output.Report($"   [RETRY] Đã bị vô hiệu hóa qua cấu hình.");
+                        JsonLogger.LogWarn("Atom_Retry_Skip", $"Retry skipped for atom {step.AtomId} because EnableRetry is false.");
+                    }
+                    else
+                    {
+                        currentAttempt++;
+                        output.Report($"   [RETRY] Có lỗi xảy ra, tự động thử lại lần {currentAttempt}/{maxRetries} sau 3 giây...");
+                        await Task.Delay(3000);
+                        continue;
+                    }
                 }
 
                 var label = outcome switch
@@ -52,10 +60,18 @@ public class AtomInvoker(AtomRegistry registry)
             {
                 if (currentAttempt < maxRetries)
                 {
-                    currentAttempt++;
-                    output.Report($"   [RETRY] Ngoại lệ '{ex.Message}', tự động thử lại lần {currentAttempt}/{maxRetries} sau 3 giây...");
-                    await Task.Delay(3000);
-                    continue;
+                    if (!FeatureFlags.Instance.IsEnabled("EnableRetry"))
+                    {
+                        output.Report($"   [RETRY] Đã bị vô hiệu hóa qua cấu hình.");
+                        JsonLogger.LogWarn("Atom_Retry_Skip", $"Retry skipped for exception in atom {step.AtomId} because EnableRetry is false.");
+                    }
+                    else
+                    {
+                        currentAttempt++;
+                        output.Report($"   [RETRY] Ngoại lệ '{ex.Message}', tự động thử lại lần {currentAttempt}/{maxRetries} sau 3 giây...");
+                        await Task.Delay(3000);
+                        continue;
+                    }
                 }
 
                 output.Report($"   [FAIL] {ex.Message}");
@@ -108,31 +124,39 @@ public class AtomInvoker(AtomRegistry registry)
         
         if (chainFailed && executedAtoms.Count > 0)
         {
-            output.Report($"\n[ROLLBACK] Kích hoạt cơ chế Undo cho {executedAtoms.Count} atom trước đó...");
-            JsonLogger.LogInfo("Chain_Rollback_Start", $"Starting rollback for chain {chainId}");
-            
-            while (executedAtoms.Count > 0)
+            if (!FeatureFlags.Instance.IsEnabled("EnableRollback"))
             {
-                var atomToUndo = executedAtoms.Pop();
-                if (atomToUndo.Mutating)
+                output.Report("\n[ROLLBACK] Đã bị vô hiệu hóa qua cấu hình.");
+                JsonLogger.LogWarn("Chain_Rollback_Skip", "Rollback skipped because EnableRollback is false.");
+            }
+            else
+            {
+                output.Report($"\n[ROLLBACK] Kích hoạt cơ chế Undo cho {executedAtoms.Count} atom trước đó...");
+                JsonLogger.LogInfo("Chain_Rollback_Start", $"Starting rollback for chain {chainId}");
+                
+                while (executedAtoms.Count > 0)
                 {
-                    output.Report($"\n>> [Undo: {atomToUndo.DisplayName}]");
-                    try
+                    var atomToUndo = executedAtoms.Pop();
+                    if (atomToUndo.Mutating)
                     {
-                        await atomToUndo.UndoAsync(context, output);
-                        JsonLogger.LogInfo("Atom_Undo_Success", $"Undo completed for {atomToUndo.Id}");
-                    }
-                    catch (Exception ex)
-                    {
-                        // FIX LỖ THỔNG 2: Halt rollback nếu có exception
-                        output.Report($"   [FATAL] DỪNG ROLLBACK: Gỡ '{atomToUndo.Id}' thất bại: {ex.Message}");
-                        output.Report($"   Nguy cơ hỏng Working Tree! Các bước trước đó sẽ không được Undo tiếp.");
-                        JsonLogger.LogError("Atom_Undo_Error", $"Undo failed for {atomToUndo.Id}", ex);
-                        break;
+                        output.Report($"\n>> [Undo: {atomToUndo.DisplayName}]");
+                        try
+                        {
+                            await atomToUndo.UndoAsync(context, output);
+                            JsonLogger.LogInfo("Atom_Undo_Success", $"Undo completed for {atomToUndo.Id}");
+                        }
+                        catch (Exception ex)
+                        {
+                            // FIX LỖ THỔNG 2: Halt rollback nếu có exception
+                            output.Report($"   [FATAL] DỪNG ROLLBACK: Gỡ '{atomToUndo.Id}' thất bại: {ex.Message}");
+                            output.Report($"   Nguy cơ hỏng Working Tree! Các bước trước đó sẽ không được Undo tiếp.");
+                            JsonLogger.LogError("Atom_Undo_Error", $"Undo failed for {atomToUndo.Id}", ex);
+                            break;
+                        }
                     }
                 }
+                output.Report("\n[ROLLBACK] Đã kết thúc tiến trình Undo.");
             }
-            output.Report("\n[ROLLBACK] Đã kết thúc tiến trình Undo.");
         }
         
         JsonLogger.LogInfo("Chain_End", $"Chain {chainId} completed. (Failed: {chainFailed})");

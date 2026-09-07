@@ -49,7 +49,7 @@ public partial class App : Application
         }
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         JsonLogger.LogError("App_UnobservedTaskError", e.Exception.Message, e.Exception);
         e.SetObserved();

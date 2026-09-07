@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevGitAtom.Contracts;
 
-namespace DevGitAtom.GitAtoms;
+namespace DevGitAtom.GitAtoms.Atoms;
 
 public class RebaseAtom : IAtom
 {
